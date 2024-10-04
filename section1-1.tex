@@ -1,0 +1,51 @@
+\section{符号计算}
+到目前为止，我们所做的只是以简单的袖珍计算器的方式操纵数字。Lisp比计算器更有用有两个主要原因。首先，它允许我们操作数字以外的对象，其次，它允许定义在后续计算中可能有用的新对象。我们将依次研究这两个重要属性。
+
+除了数字，Lisp还可以表示字符（字母）、字符串和任意符号，我们可以自由地将这些符号解释为数学世界之外的事物。Lisp还可以通过将多个对象组合成一个列表来构建非原子对象。这种能力是基本的，在语言中得到了很好的支持；事实上，Lisp这个名字是LISt Processing的缩写。
+
+下面是一个列表计算的实例：
+\begin{lstlisting}[frame=shadowbox]
+> (append '(Pat Kim) '(Robin Sandy)) => (PAT KIM ROBIN SANDY)
+\end{lstlisting}
+这个表达式将两个名字的列表连接在一起。计算此表达式的规则与数值计算的规则相同：将函数（在本例中为append）应用于参数的值。
+
+不寻常的部分是引号（'），它用于阻止对以下表达式的求值，并按字面意思返回它。如果我们只有表达式（Pat Kim），则可以通过将Pat视为函数并将其应用于表达式Kim的值来对其进行评估。这不是我们想要的。引号指示Lisp将列表视为一段数据，而不是函数调用：
+\begin{lstlisting}[frame=shadowbox]
+> '(Pat Kim) => (PAT KIM)
+\end{lstlisting}
+在其他计算机语言（和英语）中，引号通常成对出现：一个标记开始，一个标记结束。在Lisp中，单引号用于标记表达式的开头。由于我们总是知道一个表达式有多长——要么到原子的末尾，要么到列表的匹配括号——我们不需要明确的标点符号来告诉我们表达式在哪里结束。引号可以用于列表，如'(Pat Kim)，也可以用于符号，如'Robin，事实上还可以用于其他任何东西。以下是一些示例：
+\begin{lstlisting}[frame=shadowbox]
+> 'John => JOHN
+
+> '(John Q Public) => (JOHN Q PUBLIC)
+
+> '2 => 2
+
+> 2 => 2
+
+> '(+ 2 2) => (+ 2 2)
+
+> (+ 2 2) 4
+
+> John => *Error: JOHN is not a bound variable*
+
+> (John Q Public) => *Error: JOHN is not a function*
+\end{lstlisting}
+请注意，'2的计算结果为2，因为它是一个引号表达式，而2的计算值为2，是因为数字本身的计算结果。同样的结果，不同的原因。相比之下，'John求值为John是因为它是一个引号表达式，但求值John会导致错误，因为求值一个符号意味着得到符号的值，而没有给John赋值。
+
+符号计算可以嵌套，甚至可以与数值计算混合。以下表达式使用内置函数list以与我们之前看到的略有不同的方式构建名称列表。然后，我们将看到如何使用内置函数length查找列表中的元素数量：
+\begin{lstlisting}[frame=shadowbox]
+> (append '(Pat Kim) (list '(John Q Public) 'Sandy))
+(PAT KIM (JOHN Q PUBLIC) SANDY)
+
+> (length (append '(Pat Kim) (list '(John Q Public) 'Sandy)))
+4
+\end{lstlisting}
+
+关于符号，有四点要强调：
+\begin{itemize}
+	\item 首先，重要的是要记住，Lisp不会给它所操纵的对象附加任何外部意义。例如，我们自然会认为（Robin Sandy）是两个名字的列表，而（John Q Public）是一个人的名字、中间的首字母和姓氏的列表。Lisp没有这样的先入为主的观念。对于Lisp来说，Robin和xyzzy都是非常好的符号。
+	\item 其次，为了进行上述计算，我们必须知道append、length和+是Common Lisp中定义的函数。学习一门语言涉及记忆词汇（或知道在哪里查找），以及学习形成表达式和确定其含义的基本规则。Common Lisp提供了700多个内置函数。在某些时候，读者应该翻阅参考文本，看看里面有什么，但大多数重要功能都在本书的第一部分中介绍。
+	\item 第三，请注意Common Lisp中的符号不区分大小写。我的意思是，输入John, john, 和jOhN都引用了相同的符号，通常打印为JOHN。
+	\item 第四，请注意，符号中允许使用各种各样的字符：数字、字母和其他标点符号，如“+”或“ ！”构成符号的确切规则有点复杂，但通常的惯例是使用主要由字母组成的符号，单词之间用破折号（-）分隔，最后可能还有一个数字。一些程序员在命名变量时更为自由，并包含“？！\$/<=>”等字符。例如，在Lisp中，一个将美元转换为日元的函数可能会用符号\$-to-yen或\$->yen命名，而在Pascal或C中，可能会使用DollarsToYen、dollars\_to\_yen或dol2yen这样的符号。这些命名约定有一些例外，将在出现时处理。
+\end{itemize}

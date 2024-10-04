@@ -1,0 +1,18 @@
+\section{特殊形式}
+细心的读者会注意到setf违反了求值规则。我们之前说过，像+、-和append这样的函数通过首先评估它们的所有参数，然后将函数应用于结果来工作。但是setf并不遵循这个规则，因为setf根本不是一个函数。相反，它是Lisp基本语法的一部分。除了原子和函数调用的语法，Lisp还有少量的语法表达式。它们被称为特殊形式。它们与其他编程语言中的语句具有相同的目的，并且确实具有一些相同的语法标记，例如if和loop。Lisp的语法和其他语言有两个主要区别。首先，Lisp的语法形式总是列表，其中第一个元素是少数特权符号之一。setf是这些符号之一，因此(setf x 10)是一种特殊形式。其次，特殊形式是返回值的表达式。这与大多数语言中的语句形成鲜明对比，后者具有效果但不返回值。
+
+在计算像(setf x(+ 1 2))这样的表达式时，我们将符号x命名的变量设置为值(+ 1 2)，即3。如果setf是一个普通函数，我们将计算符号x和表达式(+ 1 2)，并对这两个值进行处理，这根本不是我们想要的。setf之所以被称为特殊形式，是因为它做了一些特殊的事情：如果它不存在，就不可能编写一个为变量赋值的函数。Lisp的哲学是提供少量的特殊形式来完成原本无法完成的事情，然后期望用户将其他所有内容都作为函数编写。
+
+特殊形式一词被混淆地用来指代像setf这样的符号和以它们开头的表达式，比如(setf x 3)。在《Common LISPcraft》一书中，Wilensky通过调用setf一个特殊函数并为(setf x 3)保留特殊形式来解决歧义。这个术语意味着setf只是另一个函数，但它是一个特殊的函数，因为它的第一个参数没有被求值。在Lisp主要是一种解释性语言的时代，这种观点是有道理的。现代观点认为，setf不应被视为某种异常函数，而应被视为由编译器专门处理的特殊语法的标记。因此，特殊形式(setf x (+ 2 1))应被视为x = 2+1的等价物。当存在混淆的风险时，我们将setf称为特殊形式运算符，将(setf x 3)称为特殊格式表达式。
+
+原来引号只是另一种特殊形式的缩写。表达式'x等价于（quote x），一个计算结果为x的特殊形式表达式。本章中使用的特殊形式运算符是：
+\begin{itemize}
+	\item defun : define function
+	\item defparameter : define special variable
+	\item setf : set variable or field to new value
+	\item let : bind local variable(s)
+	\item case : choose one of several alternatives
+	\item if : do one thing or another, depending on a test
+	\item function(\#') : refer to a function
+	\item quote(') : introduce constant data
+\end{itemize}
