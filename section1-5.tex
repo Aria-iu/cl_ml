@@ -1,0 +1,53 @@
+\section{定义新的函数}
+特殊形式defun代表“define function”。在这里用于定义一个名为last-name的新函数：
+\begin{lstlisting}[frame=shadowbox]
+(defun last-name (name)
+"Select the last name from a name represented as a list."
+(first (last name)))
+\end{lstlisting}
+
+我们为新函数命名为last-name。它有一个由单个参数组成的参数列表：(name)。这意味着函数接受一个参数，我们称之为name。它还有一个文档字符串，说明函数的作用。这在任何计算中都没有使用，但文档字符串是调试和理解大型系统的关键工具。定义的主体是(first (last name)))，这是我们之前用来挑选p的姓氏的。不同的是，在这里我们想挑选任何名字的姓氏，而不仅仅是特定名字p的姓氏。
+
+一般来说，函数定义采用以下形式（其中文档字符串是可选的，所有其他部分都是必需的）：
+
+\textsl{\emph{(defun function-name (parameter...)     "documentation string"     function-body...)}}
+
+函数名必须是一个符号，参数通常是符号（稍后会解释一些复杂情况），函数体由一个或多个表达式组成，在调用函数时对其进行求值。最后一个表达式作为函数调用的值返回。
+
+一旦我们定义了last-name，我们就可以像使用任何其他Lisp函数一样使用它：
+\begin{lstlisting}[frame=shadowbox]
+> (last-name p) => PUBLIC
+
+> (last-name '(Rear Admiral Grace Murray Hopper)) => HOPPER
+
+> (last-name '(Rex Morgan MD)) => MD
+
+> (last-name '(Spot)) => SPOT
+
+> (last-name '(Aristotle)) => ARISTOTLE
+\end{lstlisting}
+
+\begin{lstlisting}[frame=shadowbox]
+(defun first-name (name)
+"Select the first name from a name represented as a list."
+(first name))
+
+> p => (JOHN Q PUBLIC)
+
+> (first-name p) => JOHN
+
+> (first-name '(Wilma Flintstone)) => WILMA
+
+> (setf names '((John Q Public) (Malcolm X)
+(Admiral Grace Murray Hopper) (Spot)
+(Aristotle) (A A Milne) (Z Z Top)
+(Sir Larry Olivier) (Miss Scarlet))) =>
+
+((JOHN Q PUBLIC) (MALCOLM X) (ADMIRAL GRACE MURRAY HOPPER)
+(SPOT) (ARISTOTLE) (A A MILNE) (Z Z TOP) (SIR LARRY OLIVIER)
+(MISS SCARLET))
+
+> (first-name (first names)) => JOHN
+\end{lstlisting}
+
+

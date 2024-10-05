@@ -1,0 +1,101 @@
+\section{高阶函数}
+Lisp中的函数不仅可以被“调用”或作为参数，还可以像任何其他类型的对象一样被操纵。\emph{将另一个函数作为参数的函数称为高阶函数。}mapcar就是一个例子。为了演示高阶函数式编程，我们将定义一个名为mappend的新函数。它有两个参数，一个函数和一个列表。mappend将函数映射到列表的每个元素上，并将所有结果附加在一起。
+
+\begin{lstlisting}[frame=shadowbox]
+(defun mappend (fn the-list)
+	"Apply fn to each element of list and append the results."
+	(apply #'append (mapcar fn the-list)))
+\end{lstlisting}
+
+现在我们做一些实验，看看apply和mappend是如何工作的。第一个例子将加法函数应用于四个数字的列表。
+\begin{lstlisting}[frame=shadowbox]
+> (apply #'+ '(1 2 3 4)) => 10
+\end{lstlisting}
+
+下一个示例将append应用于一个包含两个参数的列表，其中每个参数都是一个列表。如果参数不是列表，那将是一个错误。
+\begin{lstlisting}[frame=shadowbox]
+> (apply #'append '((1 2 3) (a b c))) => (1 2 3 A B C)
+\end{lstlisting}
+
+现在我们定义一个新函数self-and-double，并将其应用于各种参数。
+\begin{lstlisting}[frame=shadowbox]
+> (defun self-and-double (x) (list x (+ x x)))
+
+> (self-and-double 3) => (3 6)
+
+> (apply #'self-and-double '(3)) => (3 6)
+
+> (mapcar #'self-and-double '(1 10 300)) => ((1 2) (10 20) (300 600))
+
+> (mappend #'self-and-double '(1 10 300)) => (1 2 10 20 300 600)
+\end{lstlisting}
+当mapcar被传递一个函数和一个包含三个参数的列表时，它总是返回一个包含3个值的列表。每个值都是对相应参数调用函数的结果。相比之下，当调用mappend时，它返回一个大列表，该列表等于mapcar将生成的所有附加值。使用不返回列表的函数调用mappend将是一个错误，因为append希望将列表作为其参数。
+
+现在考虑以下问题：给定一个元素列表，返回一个由原始列表中的所有数字和这些数字的负数组成的列表。例如，给定列表(1 2 3)，返回(1 -1 2 -2 3 -3)。使用mappend作为组件可以很容易地解决这个问题：
+\begin{lstlisting}[frame=shadowbox]
+(defun numbers-and-negations (input)
+	"Given a list, return only the numbers and their negations."
+	(mappend #'number-and-negation input))
+
+(defun number-and-negation (x)
+	"If x is a number, return a list of x and -x."
+	(if (numberp x)
+	(list x (- x))
+	nil))
+
+> (numbers-and-negations '(testing 1 2 3 test)) => (1 -1 2 -2 3 -3)
+\end{lstlisting}
+
+下面显示的mappend的替代定义没有使用mapcar；相反，它一次构建一个元素的列表：
+\begin{lstlisting}[frame=shadowbox]
+(defun mappend (fn the-list)
+	"Apply fn to each element of list and append the results."
+	(if (null the-list)
+		nil
+		(append (funcall fn (first the-list))
+			(mappend fn (rest the-list)))))
+\end{lstlisting}
+
+funcall类似于apply；它也将函数作为其第一个参数，并将该函数应用于参数列表，但在funcall的情况下，参数是单独列出的：
+\begin{lstlisting}[frame=shadowbox]
+> (funcall #'+ 2 3) => 5
+
+> (apply #'+ '(2 3)) => 5
+
+> (funcall #'+ '(2 3)) => *Error: (2 3) is not a number.*
+\end{lstlisting}
+分别等价于(+ 2 3)、(+ 2 3)和(+ '(2 3))。
+
+到目前为止，我们使用的每个函数都是在Common Lisp中预定义的，或者引入了一个defun，它将函数与名称配对。也可以使用特殊语法lambda在不给函数命名的情况下引入函数（匿名函数）。
+
+一般来说，lambda表达式的形式是：
+
+\emph{(lambda (parameters...) body...)}
+
+lambda表达式只是函数的非原子名称，就像append是内置函数的原子名称一样。因此，它适合在函数调用的第一个位置使用，但如果我们想得到实际的函数，而不是它的名称，我们仍然必须使用\#'符号。例如：
+\begin{lstlisting}[frame=shadowbox]
+> ((lambda (x) (+ x 2)) 4) => 6
+
+> (funcall #'(lambda (x) (+ x 2)) 4) => 6
+\end{lstlisting}	
+
+为了理解这种区别，我们必须清楚如何在Lisp中计算表达式。正常的计算规则规定，通过查找符号所引用的变量的值来计算符号。因此，(+ x 2)中的x是通过查找名为x的变量值来计算的。列表的计算方式有两种。如果列表的第一个元素是特殊形式运算符，则根据该特殊形式的语法规则对列表进行求值。否则，列表表示函数调用。第一个元素作为一个函数以独特的方式进行评估。这意味着它可以是符号或lambda表达式。在任何一种情况下，由第一个元素命名的函数都会应用于列表中其余元素的值。这些值由正常的评估规则确定。如果我们想在函数调用的第一个元素之外的位置引用一个函数，我们必须使用\#'符号。否则，表达式将按正常求值规则求值，不会被视为函数。例如：
+\begin{lstlisting}[frame=shadowbox]
+> append => *Error: APPEND is not a bound variable*
+
+> (lambda (x) (+ x 2)) => *Error: LAMBDA is not a function*
+
+> (mapcar #'(lambda (x) (+ x x))
+'(1 2 3 4 5)) =>
+(2 4 6 8 10)
+
+> (mappend #'(lambda (l) (list l (reverse l)))
+'((1 2 3) (a b c))) =>
+((1 2 3) (3 2 1) (A B C) (C B A))
+\end{lstlisting}
+
+习惯于其他语言的程序员有时看不到lambda表达式的意义。lambda表达式非常有用有两个原因。
+
+首先，用多余的名称弄乱程序可能会很混乱。正如写(a+b)*(c+d)比发明像temp1和temp2这样的变量名来保存a+b和c+d更清晰一样，将函数定义为lambda表达式也更清晰，而不是为它发明一个名称。
+
+其次，更重要的是，lambda表达式使在运行时创建新函数成为可能。这是一种强大的技术，在大多数编程语言中是不可能的。这些运行时函数，称为闭包。

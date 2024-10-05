@@ -1,0 +1,25 @@
+\section{Lisp求值规则}
+我们现在可以总结Lisp的求值规则。
+
+\begin{itemize}
+	\item 每个表达式要么是list，要么是atom。
+	\item 每个要计算的列表都是一个特殊的形式表达式(special form expression)或函数应用(function application)。
+	\item 特殊形式表达式被定义为第一个元素是特殊形式运算符的列表。表达式根据运算符的特殊求值规则进行求值。例如，setf的评估规则是根据正常评估规则评估第二个参数，将第一个参数设置为该值，并将该值作为结果返回。defun的规则是定义一个新函数，并返回函数的名称。引用的规则是返回第一个未求值的参数。符号'x实际上是特殊形式表达式(quote x)的缩写。同样，符号\#'f是特殊形式表达式(function f)的缩写。
+	\begin{lstlisting}[frame=shadowbox]
+'John ≡ (quote John) => JOHN
+				
+(setf p 'John) => JOHN
+		
+(defun twice (x) (+ x x)) => TWICE
+		
+(if (= 2 3) (error) (+ 5 6)) => 11
+	\end{lstlisting}
+	\item 函数应用(function application)的评估方法是首先评估参数（列表的其余部分），然后找到列表中第一个元素命名的函数并将其应用于评估的参数列表。
+	\begin{lstlisting}[frame=shadowbox]
+(+ 2 3) => 5
+(- (+ 90 9) (+ 50 5 (length '(Pat Kim)))) => 42
+	\end{lstlisting}
+	\item 每个原子(atom)要么是符号(symbol)，要么是非符号(nonsymbol)。
+	\item 符号的计算结果为分配给该符号命名的变量的最新值。符号由字母组成，可能还有数字，很少还有标点符号。为了避免混淆，我们将使用主要由字母a-z和“-”字符组成的符号，只有少数例外。
+	\item 非符号原子会自行计算。目前，数字和字符串是我们所知的唯一非符号原子。数字由数字组成，可能还有小数点和符号。也有科学记数法、有理数和复数以及不同基数的数字的规定，但我们不会在这里详细描述。字符串两边用双引号分隔。
+\end{itemize}

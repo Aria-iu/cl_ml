@@ -16,3 +16,58 @@
 > (length p) => 3
 \end{lstlisting}
 
+函数first、second、third和fourth的命名很恰当：first返回列表的第一个元素，second给出第二个元素，以此类推。函数rest并不那么明显；它的名字代表“列表中第一个元素之后的其余部分”。符号nil和形式()完全同义；它们都是空列表的表示。nil也用于表示Lisp中的“false”值。因此，(fourth p)是nil，因为p中没有第四个元素。请注意，列表不一定只由原子组成，也可以包含子列表作为元素：
+
+\begin{lstlisting}[frame=shadowbox]
+> (setf x '((1st element) 2 (element 3) ((4)) 5))
+((1ST ELEMENT) 2 (ELEMENT 3) ((4)) 5)
+
+> (length x) => 5
+
+> (first x) => (1ST ELEMENT)
+
+> (second x) => 2
+
+> (third x) => (ELEMENT 3)
+
+> (fourth x) => ((4))
+
+> (first (fourth x)) => (4)
+
+> (first (first (fourth x))) => 4
+
+> (fifth x) => 5
+
+> (first x) => (1ST ELEMENT)
+
+> (second (first x)) => ELEMENT
+\end{lstlisting}
+
+目前为止，我们知道了如何访问list的部分。下面是如何建立新的list：
+\begin{lstlisting}[frame=shadowbox]
+> p => (JOHN Q PUBLIC)
+
+> (cons 'Mr p) => (MR JOHN Q PUBLIC)
+
+> (cons (first p) (rest p)) => (JOHN Q PUBLIC)
+
+> (setf town (list 'Anytown 'USA)) => (ANYTOWN USA)
+
+> (list p 'of town 'may 'have 'already 'won!) =>
+((JOHN Q PUBLIC) OF (ANYTOWN USA) MAY HAVE ALREADY WON!)
+
+> (append p '(of) town '(may have already won!)) =>
+(JOHN Q PUBLIC OF ANYTOWN USA MAY HAVE ALREADY WON!)
+
+> p => (JOHN Q PUBLIC)
+\end{lstlisting}
+
+函数cons代表“构造”。它接受一个元素和一个列表作为参数，并构造一个新的列表，其第一个是元素，其余的是原始列表。list接受任意数量的元素作为参数，并返回一个按顺序包含这些元素的新列表。我们已经看到append，它类似于list；它接受任意数量的列表作为参数，并将它们全部附加在一起，形成一个大列表。因此，要附加的参数必须是列表，而要列出的参数可以是列表或原子。值得注意的是，这些函数会创建新的列表；他们不会修改旧的。当我们说（append p q）时，效果是创建一个全新的列表，该列表以p中的相同元素开始，p本身保持不变。
+
+现在，让我们远离列表上的抽象函数，考虑一个简单的问题：给定一个人的名字以列表的形式，我们如何提取姓氏？对于（JOHN Q PUBLIC），我们可以只使用函数third，但对于没有中间名的人来说，这是行不通的。Common Lisp中有一个名为last的函数；也许这会奏效。我们可以尝试：
+\begin{lstlisting}[frame=shadowbox]
+> (last p) => (PUBLIC)
+
+> (first (last p)) => PUBLIC
+\end{lstlisting}
+事实证明，last反常地返回最后一个元素的列表，而不是最后一个元件本身。因此，我们需要将first和last组合起来，以找出实际的最后一个要素。我们希望能够保存我们所做的工作，并给它一个适当的描述，比如姓氏。我们可以使用setf保存p的姓氏，但这无助于确定任何其他姓氏。相反，我们想定义一个新函数，该函数计算表示为列表的任何名称的姓氏。下一节正是这样做的。

@@ -1,0 +1,85 @@
+\section{使用函数}
+正如我们上面所做的那样，定义一个名称列表的一个好处是，它使测试我们的函数变得更加容易。考虑以下表达式，它可用于测试last-name函数：
+
+\begin{lstlisting}[frame=shadowbox]
+> (mapcar #'last-name names)
+(PUBLIC X HOPPER SPOT ARISTOTLE MILNE TOP OLIVIER SCARLET)
+\end{lstlisting}
+\#'符号从函数的名称映射到函数本身。这类似于'x符号。内置函数mapcar传递了两个参数，一个函数和一个列表。它返回一个列表，该列表是通过在输入列表的每个元素上调用函数构建的。换句话说，上面的mapcar调用相当于：
+\begin{lstlisting}[frame=shadowbox]
+(list (last-name (first names))
+	(last-name (second names))
+	(last-name (third names))
+	...)
+\end{lstlisting}
+mapcar的名字来源于它将函数“映射”到每个参数上。car部分的名字是指Lisp函数car，first的旧名字。cdr是rest的旧名称。这些名称代表“地址寄存器的内容”和“递减寄存器的内容“，这是在IBM 704上首次实现Lisp时使用的指令。我相信你会同意first和rest是更好的名字，每当我们谈论列表时，它们都会被用来代替car和cdr。然而，当我们考虑一对不被视为列表的值时，我们偶尔会继续使用car和cdr。请注意，一些程序员仍然使用car和cdr作为列表。
+
+下面是一些mapcar的例子：
+\begin{lstlisting}[frame=shadowbox]
+> (mapcar #'- '(1 2 3 4)) => (-1 -2 -3 -4)
+
+> (mapcar #'+ '(1 2 3 4) '(10 20 30 40)) => (11 22 33 44)
+\end{lstlisting}
+最后一个例子表明，mapcar可以传递三个参数，在这种情况下，第一个参数应该是一个二进制函数，它将应用于其他两个列表的相应元素。一般来说，mapcar期望一个n元函数作为其第一个参数，然后是n个列表。它首先将函数应用于通过收集每个列表的第一个元素而获得的参数列表。然后，它将该函数应用于每个列表的第二个元素，依此类推，直到其中一个列表耗尽。它返回已计算的所有函数值的列表。
+
+现在我们已经了解了mapcar，让我们用它来测试last-name函数：
+\begin{lstlisting}[frame=shadowbox]
+> (mapcar #'first-name names)
+(JOHN MALCOLM ADMIRAL SPOT ARISTOTLE A Z SIR MISS)
+\end{lstlisting}
+
+我们可能会对这些结果感到失望。假设我们想要一个名字的版本，忽略了Admiral和Miss等头衔，得到了“真实”的名字。我们可以按以下方式进行：
+\begin{lstlisting}[frame=shadowbox]
+(defparameter *titles*
+	'(Mr Mrs Miss Ms Sir Madam Dr Admiral Major General)
+	"A list of titles that can appear at the start of a name.")
+\end{lstlisting}
+我们引入了另一种新的特殊形式defparameter，它定义了一个参数——一个在计算过程中不会改变的变量，但当我们想到要添加的新东西时，它可能会改变。defparameter形式既给变量一个值，又可以在后续的函数定义中使用该变量。在这个例子中，我们练习了提供描述变量的文档字符串的选项。Lisp程序员中广泛使用的一种惯例是，通过在两端用星号拼写特殊变量的名称来标记它们。这只是一个惯例；在Lisp中，星号只是另一个没有特定含义的字符。
+
+接下来，我们为first-name给出了一个新的定义，它取代了之前的定义。这个定义说，如果名字的第一个单词是标题列表中的成员，那么我们想忽略这个单词，并返回名字中其余单词的名字。否则，我们使用第一个单词，就像以前一样。另一个内置函数member测试其第一个参数是否是作为第二个参数传递的列表中的元素。
+
+特殊形式if具有形式（if test then-part else-part）。在Lisp中执行条件测试有许多特殊形式；if对于这个例子来说是最合适的。通过首先计算测试表达式来计算if表单。如果为真，则对then-part进行求值，并将其作为If表单的值返回；否则，将评估并返回else-part。虽然一些语言坚持条件测试的值必须为真或假，但Lisp更宽容。该测试可以合法地评估任何值。只有值nil被认为是false；所有其他值都被视为真。在下面的first-name定义中，如果名字的第一个元素在标题列表中，函数member将返回一个非nil（因此为true）的值，如果不是，则将返回nil（因而为false）。虽然所有非空值都被认为是真的，但按照惯例，常数t通常用于表示真值。
+\begin{lstlisting}[frame=shadowbox]
+(defun first-name (name)
+	"Select the first name from a name represented as a list."
+	(if (member (first name) *titles*)
+	(first-name (rest name))
+	(first name)))
+\end{lstlisting}
+
+当我们将新的first-name映射到名字列表上时，结果更令人鼓舞。此外，该函数通过跳过头衔来获得“正确”的结果。
+\begin{lstlisting}[frame=shadowbox]
+> (mapcar #'first-name names)
+(JOHN MALCOLM GRACE SPOT ARISTOTLE A Z LARRY SCARLET)
+
+> (first-name '(Madam Major General Paula Jones))
+PAULA
+\end{lstlisting}
+
+通过tracing the execution of first-name，并查看传递给函数和从函数返回的值，我们可以看到这是如何工作的。特殊形式的跟踪和未跟踪用于此目的。
+\begin{lstlisting}[frame=shadowbox]
+> (trace first-name)
+(FIRST-NAME)
+
+> (first-name '(John Q Public))
+(1 ENTER FIRST-NAME: (JOHN Q PUBLIC))
+(1 EXIT FIRST-NAME: JOHN)
+JOHN
+
+> (first-name '(Madam Major General Paula Jones)) =>
+	(1 ENTER FIRST-NAME: (MADAM MAJOR GENERAL PAULA JONES))
+		(2 ENTER FIRST-NAME: (MAJOR GENERAL PAULA JONES))
+			(3 ENTER FIRST-NAME: (GENERAL PAULA JONES))
+				(4 ENTER FIRST-NAME: (PAULA JONES))
+				(4 EXIT FIRST-NAME: PAULA)
+			(3 EXIT FIRST-NAME: PAULA)
+		(2 EXIT FIRST-NAME: PAULA)
+	(1 EXIT FIRST-NAME: PAULA)
+PAULA
+
+> (untrace first-name) => (FIRST-NAME)
+
+> (first-name '(Mr Blue Jeans)) => BLUE
+\end{lstlisting}
+函数first-name被称为递归的，因为它的定义包括对自身的调用。不熟悉递归概念的程序员有时会觉得它很神秘。但递归函数实际上与非递归函数没有什么不同。任何函数都需要为给定的输入返回正确的值。另一种看待这一要求的方法是将其分为两部分：函数必须返回一个值，并且不能返回任何不正确的值。这个由两部分组成的要求与第一个要求等效，但它使思考和设计功能定义变得更加容易。
+

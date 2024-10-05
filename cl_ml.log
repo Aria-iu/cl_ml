@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999996 (TeX Live 2024/Arch Linux) (preloaded format=xelatex 2024.9.3)  4 OCT 2024 12:50
+This is XeTeX, Version 3.141592653-2.6-0.999996 (TeX Live 2024/Arch Linux) (preloaded format=xelatex 2024.9.3)  5 OCT 2024 15:14
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -700,8 +700,33 @@ LaTeX Font Info:    Font shape `TU/FandolSong-Regular(0)/m/sl' in size <10.5393
 7> not available
 (Font)              Font shape `TU/FandolSong-Regular(0)/m/it' tried instead on
  input line 48.
- [2]) (./section1-2.tex [3]) (./section1-3.tex [4])
-(./section1-4.tex)) [5] (./cl_ml.aux)
+ [2]) [3] (./section1-2.tex) [4] (./section1-3.tex
+[5]) [6] (./section1-4.tex [7] [8]) [9] (./section1-5.tex [10]) [11]
+(./section1-6.tex [12] [13] [14]) [15] (./section1-7.tex [16] [17] [18])
+[19] (./section1-8.tex) [20] (./section1-9.tex
+Missing character: There is no ≡ (U+2261) in font [lmroman10-regular]:mapping=t
+ex-text;!
+[21]) [22] (./section1-10.tex) [23] (./section1-11.tex
+Overfull \hbox (5.95398pt too wide) in paragraph at lines 5--6
+[]\TU/lmr/bx/n/10.53937 Exercise 1.3  \TU/FandolSong-Regular(0)/m/n/10.53937 编 
+写 一 个 函 数，|  对 表 达 式 中 的 原 子 数 进 行 计 数。|  例 如： （\TU/lmr/m/n/10.53937 count-
+ []
+
+) [24] (./section1-12.tex [25])) [26] (./chapter2.tex
+第二章
+(./section2-1.tex)
+Overfull \hbox (630.65692pt too wide) in paragraph at lines 2--3
+\TU/FandolSong-Regular(0)/m/n/10.53937 语 法：| []
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2--3
+
+ []
+
+[27
+
+]) (./cl_ml.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2022/08/05>
@@ -713,16 +738,16 @@ Package rerunfilecheck Warning: File `cl_ml.out' has changed.
 (rerunfilecheck)                or use package `bookmark'.
 
 Package rerunfilecheck Info: Checksums for `cl_ml.out':
-(rerunfilecheck)             Before: 35BE7290CFCB1626B4621C4AB3186E7E;329
-(rerunfilecheck)             After:  F0980C66C455EB0EAA8A22CECF83E1B3;399.
+(rerunfilecheck)             Before: 0A6275B4D089A908A71BA4C542FB9B43;1389
+(rerunfilecheck)             After:  82286E7626812ED6CB0E2B530F42C994;1627.
  ) 
 Here is how much of TeX's memory you used:
- 17228 strings out of 476761
- 384587 string characters out of 5802896
- 2045839 words of memory out of 5000000
- 39030 multiletter control sequences out of 15000+600000
- 560773 words of font info for 59 fonts, out of 8000000 for 9000
+ 17351 strings out of 476761
+ 390431 string characters out of 5802896
+ 2130839 words of memory out of 5000000
+ 39120 multiletter control sequences out of 15000+600000
+ 560789 words of font info for 61 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 107i,5n,111p,645b,965s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 107i,6n,111p,645b,1810s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on cl_ml.pdf (5 pages).
+Output written on cl_ml.pdf (27 pages).
